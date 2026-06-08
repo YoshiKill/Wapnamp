@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winamp Web</title>
+<style>
+  body {
+    background-color: #000000;
+    color: #00FF00;
+    font-family: monospace;
+    padding: 10px;
+    margin: 0;
+  }
+  .player {
+    border: 2px solid #555;
+    padding: 5px;
+    background-color: #111;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .header {
+    background-color: #000080;
+    color: #FFF;
+    padding: 2px 5px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .author {
+    color: #00FF00;
+    font-size: 11px;
+    font-weight: normal;
+  }
+  .station {
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #333;
+    padding-bottom: 5px;
+  }
+  .btn {
+    display: inline-block;
+    background-color: #444;
+    color: #00FF00;
+    text-decoration: none;
+    padding: 5px 15px;
+    border: 2px outset #666;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  .btn:active {
+    border-style: inset;
+  }
+</style>
+</head>
+<body>
+  <div class="player">
+    <div class="header">
+      <span>⚡ WINAMP - 40GB CLUB</span>
+      <span class="author">by Tualatin</span>
+    </div>
+
+    <div class="station">
+      128kbps MP3<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio128.mp3" class="btn">▶ PLAY</a>
+    </div>
+
+    <div class="station">
+      64kbps MP3<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio64.mp3" class="btn">▶ PLAY</a>
+    </div>
+
+    <div class="station">
+      48kbps MP3<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio48.mp3" class="btn">▶ PLAY</a>
+    </div>
+
+    <div class="station">
+      32kbps MP3<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio32.mp3" class="btn">▶ PLAY</a>
+    </div>
+
+    <div class="station">
+      48kbps Vorbis<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio48.ogg" class="btn">▶ PLAY</a>
+    </div>
+
+    <div class="station">
+      64kbps Vorbis<br>
+      <a href="http://radio.40gb.club/radio/8000/HDD40radio64.ogg" class="btn">▶ PLAY</a>
+    </div>
+  </div>
+</body>
+</html>
