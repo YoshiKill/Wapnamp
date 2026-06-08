@@ -1,85 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Winamp Web</title>
-<style>
-  body {
-    background-color: #000000;
-    color: #00FF00;
-    font-family: monospace;
-    padding: 10px;
-    margin: 0;
-  }
-  .player {
-    border: 2px solid #555;
-    padding: 5px;
-    background-color: #111;
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  .header {
-    background-color: #000080;
-    color: #FFF;
-    padding: 2px 5px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .author {
-    color: #00FF00;
-    font-size: 11px;
-    font-weight: normal;
-  }
-  .station {
-    margin-bottom: 15px;
-    border-bottom: 1px dashed #333;
-    padding-bottom: 5px;
-  }
-  .btn {
-    display: inline-block;
-    background-color: #444;
-    color: #00FF00;
-    text-decoration: none;
-    padding: 5px 15px;
-    border: 2px outset #666;
-    font-weight: bold;
-    margin-top: 5px;
-  }
-  .btn:active {
-    border-style: inset;
-  }
-</style>
+    <meta charset="UTF-8">
+    <title>HDD40 Radio RTSP Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .player-card {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 320px;
+        }
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        select {
+            background: #333;
+            color: #fff;
+        }
+        button {
+            background: #00adb5;
+            color: #fff;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #00f5ff;
+        }
+    </style>
 </head>
 <body>
-  <div class="player">
-    <div class="header">
-      <span>⚡ WINAMP - 40GB CLUB</span>
-      <span class="author">by Tualatin</span>
-    </div>
 
-    <div class="station">
-      128kbps MP3<br>
-      <a href="http://radio.40gb.club/radio/8000/HDD40radio128.mp3?live=true" class="btn">▶ PLAY</a>
-    </div>
+<div class="player-card">
+    <h3>HDD40 Radio Stream</h3>
+    
+    <audio id="audio" controls style="display:none;"></audio>
 
-    <div class="station">
-      64kbps MP3<br>
-      <a href="http://radio.40gb.club/radio/8000/HDD40radio64.mp3/;stream.mp3" class="btn">▶ PLAY (Alt)</a>
-    </div>
+    <label for="stream-select">Выберите битрейт:</label>
+    <select id="stream-select">
+        <option value="mp3-192">MP3 — 192 kbps</option>
+        <option value="mp3-128" selected>MP3 — 128 kbps</option>
+        <option value="mp3-64">MP3 — 64 kbps</option>
+    </select>
 
-    <div class="station">
-      48kbps MP3<br>
-      <a href="http://radio.40gb.club/radio/8000/HDD40radio48.mp3?live=true" class="btn">▶ PLAY</a>
-    </div>
+    <button id="play-btn">ИГРАТЬ</button>
+</div>
 
-    <div class="station">
-      32kbps MP3<br>
-      <a href="http://radio.40gb.club/radio/8000/HDD40radio32.mp3/;stream.mp3" class="btn">▶ PLAY (Alt)</a>
-    </div>
-  </div>
+<script>
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play-btn');
+    const streamSelect = document.getElementById('stream-select');
+    let hls = null;
+
+    // Функция запуска потока
+    function loadStream(streamName) {
+        // MediaMTX отдает HLS-потоки по порту 8888 в формате /имя_потока/index.m3u8
+        const streamUrl = `http://${window.location.hostname}:8888/${streamName}/index.m3u8`;
+
+        if (hls) {
+            hls.destroy();
+        }
+
+        if (Hls.isSupported()) {
+            hls = new Hls({
+                liveDurationInfinity: true,
+                manifestLoadingMaxRetry: 10,
+                manifestLoadingRetryDelay: 1000
+            });
+            hls.loadSource(streamUrl);
+            hls.attachMedia(audio);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                audio.play().catch(err => console.log("Автозапуск заблокирован браузером"));
+            });
+        } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+            // Поддержка для Safari (iOS/Mac) напрямую
+            audio.src = streamUrl;
+            audio.addEventListener('canplay', function() {
+                audio.play();
+            });
+        }
+    }
+
+    // Кнопка Играть / Стоп
+    playBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            loadStream(streamSelect.value);
+            playBtn.innerText = 'СТОП';
+            playBtn.style.background = '#ff2e63';
+        } else {
+            audio.pause();
+            if (hls) hls.destroy();
+            playBtn.innerText = 'ИГРАТЬ';
+            playBtn.style.background = '#00adb5';
+        }
+    });
+
+    // Переключение качества на лету
+    streamSelect.addEventListener('change', () => {
+        if (!audio.paused) {
+            loadStream(streamSelect.value);
+        }
+    });
+</script>
+
 </body>
 </html>
