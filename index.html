@@ -3,53 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>HDD40 Radio</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        body { background: #000; color: #0f0; font-family: "Courier New", monospace; margin: 5px; }
-        .winamp { border: 2px solid #555; width: 200px; padding: 5px; background: #222; }
-        select, button { width: 100%; background: #000; color: #0f0; border: 1px solid #555; margin-top: 5px; cursor: pointer; }
-    </style>
 </head>
-<body>
-
-<div class="winamp">
-    <div style="font-size: 12px; border-bottom: 1px solid #333;">HDD40 FM TUNER</div>
-    <audio id="audio" style="display:none;"></audio>
-    
-    <select id="stream-select">
-        <option value="mp3-192">192 kbps</option>
-        <option value="mp3-128" selected>128 kbps</option>
-        <option value="mp3-64">64 kbps</option>
-    </select>
-    
-    <button id="play-btn">▶ PLAY</button>
-</div>
-
-<script>
-    const audio = document.getElementById('audio');
-    const playBtn = document.getElementById('play-btn');
-    const streamSelect = document.getElementById('stream-select');
-    let hls = null;
-
-    function loadStream(name) {
-        const url = `http://${window.location.hostname}:8888/${name}/index.m3u8`;
-        if (hls) hls.destroy();
-        hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(audio);
-        audio.play();
-    }
-
-    playBtn.addEventListener('click', () => {
-        if (audio.paused) {
-            loadStream(streamSelect.value);
-            playBtn.innerText = '■ STOP';
-        } else {
-            audio.pause();
-            playBtn.innerText = '▶ PLAY';
-        }
-    });
-</script>
-
+<body style="background:#000; color:#0f0; font-family:monospace; margin:0; padding:10px;">
+    <div style="border:1px solid #555; width:200px; padding:10px;">
+        HDD40 FM TUNER<br><br>
+        
+        <a href="rtsp://radio.40gb.club:8554/mp3-192" style="color:#0f0; display:block; margin-bottom:10px;">▶ 192 kbps</a>
+        <a href="rtsp://radio.40gb.club:8554/mp3-128" style="color:#0f0; display:block; margin-bottom:10px;">▶ 128 kbps</a>
+        <a href="rtsp://radio.40gb.club:8554/mp3-64" style="color:#0f0; display:block;">▶ 64 kbps</a>
+    </div>
 </body>
 </html>
