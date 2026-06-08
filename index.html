@@ -1,67 +1,28 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>HDD40 Radio RTSP Player</title>
+    <meta charset="utf-8">
+    <title>HDD40 Radio</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .player-card {
-            background: #1e1e1e;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            text-align: center;
-            width: 320px;
-        }
-        select, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 6px;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        select {
-            background: #333;
-            color: #fff;
-        }
-        button {
-            background: #00adb5;
-            color: #fff;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background: #00f5ff;
-        }
+        body { background: #000; color: #0f0; font-family: "Courier New", monospace; margin: 5px; }
+        .winamp { border: 2px solid #555; width: 200px; padding: 5px; background: #222; }
+        select, button { width: 100%; background: #000; color: #0f0; border: 1px solid #555; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="player-card">
-    <h3>HDD40 Radio Stream</h3>
+<div class="winamp">
+    <div style="font-size: 12px; border-bottom: 1px solid #333;">HDD40 FM TUNER</div>
+    <audio id="audio" style="display:none;"></audio>
     
-    <audio id="audio" controls style="display:none;"></audio>
-
-    <label for="stream-select">Выберите битрейт:</label>
     <select id="stream-select">
-        <option value="mp3-192">MP3 — 192 kbps</option>
-        <option value="mp3-128" selected>MP3 — 128 kbps</option>
-        <option value="mp3-64">MP3 — 64 kbps</option>
+        <option value="mp3-192">192 kbps</option>
+        <option value="mp3-128" selected>128 kbps</option>
+        <option value="mp3-64">64 kbps</option>
     </select>
-
-    <button id="play-btn">ИГРАТЬ</button>
+    
+    <button id="play-btn">▶ PLAY</button>
 </div>
 
 <script>
@@ -70,53 +31,22 @@
     const streamSelect = document.getElementById('stream-select');
     let hls = null;
 
-    // Функция запуска потока
-    function loadStream(streamName) {
-        // MediaMTX отдает HLS-потоки по порту 8888 в формате /имя_потока/index.m3u8
-        const streamUrl = `http://${window.location.hostname}:8888/${streamName}/index.m3u8`;
-
-        if (hls) {
-            hls.destroy();
-        }
-
-        if (Hls.isSupported()) {
-            hls = new Hls({
-                liveDurationInfinity: true,
-                manifestLoadingMaxRetry: 10,
-                manifestLoadingRetryDelay: 1000
-            });
-            hls.loadSource(streamUrl);
-            hls.attachMedia(audio);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                audio.play().catch(err => console.log("Автозапуск заблокирован браузером"));
-            });
-        } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            // Поддержка для Safari (iOS/Mac) напрямую
-            audio.src = streamUrl;
-            audio.addEventListener('canplay', function() {
-                audio.play();
-            });
-        }
+    function loadStream(name) {
+        const url = `http://${window.location.hostname}:8888/${name}/index.m3u8`;
+        if (hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(audio);
+        audio.play();
     }
 
-    // Кнопка Играть / Стоп
     playBtn.addEventListener('click', () => {
         if (audio.paused) {
             loadStream(streamSelect.value);
-            playBtn.innerText = 'СТОП';
-            playBtn.style.background = '#ff2e63';
+            playBtn.innerText = '■ STOP';
         } else {
             audio.pause();
-            if (hls) hls.destroy();
-            playBtn.innerText = 'ИГРАТЬ';
-            playBtn.style.background = '#00adb5';
-        }
-    });
-
-    // Переключение качества на лету
-    streamSelect.addEventListener('change', () => {
-        if (!audio.paused) {
-            loadStream(streamSelect.value);
+            playBtn.innerText = '▶ PLAY';
         }
     });
 </script>
